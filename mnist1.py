@@ -8,7 +8,7 @@ batch_size = 100
 total_steps = 5000
 dropout_keep_prob = 0.5
 steps_per_test = 100
-
+mnisty1 = []
 
 def weight(shape, stddev=0.1, mean=0):
     initial = tf.truncated_normal(shape=shape, mean=mean, stddev=stddev)
@@ -75,9 +75,9 @@ with tf.Session() as sess:
         sess.run(train, feed_dict={x: batch[0], y_label: batch[1], keep_prob: dropout_keep_prob})
         # train accuracy
         if step % steps_per_test == 0:
+            mnisty1.append(sess.run(accuracy, feed_dict={x: batch[0], y_label: batch[1], keep_prob: 1}))
             print('Training Accuracy', step,
                   sess.run(accuracy, feed_dict={x: batch[0], y_label: batch[1], keep_prob: 1}))
-
+    print(mnisty1)
 # final Test
-print('Test Accuracy', sess.run(accuracy, feed_dict={x: mnist.test.images, y_label: mnist.test.labels,
-                                                     keep_prob: 1}))
+#print('Test Accuracy', sess.run(accuracy, feed_dict={x: mnist.test.images, y_label: mnist.test.labels,keep_prob: 1}))
