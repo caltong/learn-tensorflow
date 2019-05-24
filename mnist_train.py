@@ -24,5 +24,15 @@ def train(mnist):
     y = mnist_inference.inference(x, regularizer)
     global_step = tf.Variable(0, trainable=False)
 
-    #
-    variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY,global_step)
+    # 滑动平均
+    variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY, global_step)
+    variable_averages_op = variable_average.apply(tf.trainable_variables())
+
+    # 损失函数
+    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=y, labels=tf.argmax(y_, 1))
+    cross_entropy_mean = tf.reduce_mean(cross_entropy)
+    loss = cross_entropy_mean + tf.add_n(tf.get_collection('losses'))
+
+    # 学习率
+    learning_rate = tf.train.exponential_decay(LEARNING_RATE_BASE, global_step, mnist.train.num_example / BATCH_SIZE,
+                                               LEARNING_RATE_DECAY, staircase=True)
