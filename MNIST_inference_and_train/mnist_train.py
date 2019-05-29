@@ -1,7 +1,5 @@
 import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
-import mnist_inference
-import os
+from MNIST_inference_and_train import mnist_inference
 
 # 全局变量
 BATCH_SIZE = 100
