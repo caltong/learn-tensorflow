@@ -13,11 +13,11 @@ W = tf.Variable(tf.zeros([784, 10]))  # 初始化W为0
 b = tf.Variable(tf.zeros([10]))  # 初始化b为0
 
 # 实现softmax regression
-y = tf.nn.softmax(tf.add(tf.matmul(x, W)), b)
+y = tf.nn.softmax(tf.matmul(x, W) + b)
 
 # 定义交叉熵
 y_ = tf.placeholder(tf.float32, [None, 10])  # y' placeholder 定义
-cross_entropy = tf.reduce_mean(tf.reduce_sum(y_ * tf.log(y)))  # 交叉熵
+cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), axis=1))  # 交叉熵
 
 # 定义训练优化算法及超参数
 train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
