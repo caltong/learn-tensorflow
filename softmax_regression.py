@@ -7,7 +7,7 @@ print(mnist.train.images.shape, mnist.train.labels.shape)  # images.shape （550
 print(mnist.test.images.shape, mnist.test.labels.shape)  # images.shape （10000,784) labels.shape (10000,10)
 print(mnist.validation.images.shape, mnist.validation.labels.shape)  # images.shape （5000,784) labels.shape (5000,10)
 
-sess = tf.InteractiveSession()  # 创建session
+sess = tf.InteractiveSession()  # 创建默认Interactive Session 这样后续操作就无需指定session
 x = tf.placeholder(tf.float32, [None, 784])  # 创建输入placeholder shape与mnist数据对应
 W = tf.Variable(tf.zeros([784, 10]))  # 初始化W为0
 b = tf.Variable(tf.zeros([10]))  # 初始化b为0
