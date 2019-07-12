@@ -27,11 +27,11 @@ class AdditiveGaussianNoiseAutoEncoder(object):
         self.x = tf.placeholder(tf.float32, [None, self.n_input])  # 输入placeholder
         self.hidden = self.transfer(
             tf.add(tf.matmul(self.x + scale * tf.random_normal((n_input,)), self.weights['w1']),
-                   self.weights['d1']))  # 中间层计算
+                   self.weights['b1']))  # 中间层计算
         self.reconstruction = tf.add(tf.matmul(self.hidden, self.weights['w2']), self.weights['b2'])  # 输入与输出同维度
 
         # 定义损失函数
-        self.cost = 0.5 * tf.reduces_sum(tf.pow(tf.subtract(self.reconstruction, self.x), 2.0))
+        self.cost = 0.5 * tf.reduce_sum(tf.pow(tf.subtract(self.reconstruction, self.x), 2.0))
         self.optimizer = optimizer.minimize(self.cost)
 
         init = tf.global_variables_initializer()
@@ -40,7 +40,7 @@ class AdditiveGaussianNoiseAutoEncoder(object):
 
     def _initialize_weights(self):
         all_weights = dict()
-        all_weights['w1'] = tf.Variable(xavier_init((self.n_input, self.n_hidden)))
+        all_weights['w1'] = tf.Variable(xavier_init(self.n_input, self.n_hidden))
         all_weights['b1'] = tf.Variable(tf.zeros([self.n_hidden], dtype=tf.float32))
         all_weights['w2'] = tf.Variable(tf.zeros([self.n_hidden, self.n_input], dtype=tf.float32))
         all_weights['b2'] = tf.Variable(tf.zeros([self.n_input], dtype=tf.float32))
@@ -117,4 +117,4 @@ for epoch in range(training_epochs):
     if epoch % display_step == 0:
         print("Epoch:", '%04d' % (epoch + 1), "cost=", "{:.9f}".format(avg_cost))
 
-print("Total cost:"+str(autoencoder.calc_total_cost(X_test)))
+print("Total cost:" + str(autoencoder.calc_total_cost(X_test)))
