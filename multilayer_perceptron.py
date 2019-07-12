@@ -14,7 +14,7 @@ W2 = tf.Variable(tf.zeros([h1_units, 10]))
 b2 = tf.Variable(tf.zeros([10]))
 
 x = tf.placeholder(tf.float32, [None, 784])  # 定义输入x placeholder
-keep_prob = tf.placeholder(tf.float32)  # dropput 概率 训练时小于1 预测时等于1
+keep_prob = tf.placeholder(tf.float32)  # dropout 概率 训练时小于1 预测时等于1
 
 # 定义模型结构
 hidden1 = tf.nn.relu(tf.matmul(x, W1) + b1)
@@ -31,7 +31,7 @@ train_step = tf.train.AdadeltaOptimizer(0.3).minimize(cross_entropy)
 tf.global_variables_initializer().run()  # 初始化全局变量
 for i in range(3000):
     batch_xs, batch_ys = mnist.train.next_batch(100)  # 获取batch数据
-    train_step.run({x: batch_xs, y_: batch_ys})  # 用batch数据训练
+    train_step.run({x: batch_xs, y_: batch_ys, keep_prob: 0.75})  # 用batch数据训练
 
 # 评估
 correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
