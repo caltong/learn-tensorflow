@@ -15,7 +15,17 @@ def unpickle(file):
     return data
 
 
+# 将数据存到list中
 cifar_data = []
 for i in range(5):
-    filename = 'data_batch_' + str(i+1)
-    cifar_data[i] = unpickle(filename)
+    filename = 'data_batch_' + str(i + 1)
+    cifar_data.append(unpickle(filename))
+
+
+def variable_weight_loss(shape, stddev, wl):
+    var = tf.Variable(tf.truncated_normal(shape, stddev=stddev))
+    if wl is not None:
+        weight_loss = tf.multiply(tf.nn.l2_loss(var), wl, name='weight_loss')
+        tf.add_to_collection('losses', weight_loss)
+    return var
+
