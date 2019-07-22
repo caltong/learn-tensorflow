@@ -22,7 +22,7 @@ for i in range(5):
     cifar_data.append(unpickle(filename))
 
 
-def variable_weight_loss(shape, stddev, wl):
+def variable_with_weight_loss(shape, stddev, wl):
     var = tf.Variable(tf.truncated_normal(shape, stddev=stddev))
     if wl is not None:
         weight_loss = tf.multiply(tf.nn.l2_loss(var), wl, name='weight_loss')
