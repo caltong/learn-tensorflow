@@ -46,9 +46,11 @@ images_train, labels_train = train_data[0][b'data'], train_data[0][b'labels']  #
 test_data = load_test_data()  # 读取测试数据
 images_test, labels_test = test_data[0][b'data'], test_data[0][b'labels']  # 图片信息与标签信息
 
-images_train = images_train.reshape(10000, 32, 32, 3)
-images_test = images_test.reshape(10000, 32, 32, 3)
-print(images_train.shape)
-print(images_test.shape)
+images_train = images_train.reshape(10000, 3, 32, 32)  # reshape维度
+images_train = np.rollaxis(images_train, 1, 4)  # channel last
+images_test = images_test.reshape(10000, 3, 32, 32)  # reshape维度
+images_test = np.rollaxis(images_test, 1, 4)  # channel last
 
-plt.imshow(images_train[0])
+print(images_train.shape)  # (10000,32,32,3)
+print(images_test.shape)  # (10000,32,32,3)
+
