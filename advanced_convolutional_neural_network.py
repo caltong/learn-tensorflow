@@ -54,3 +54,9 @@ images_test = np.rollaxis(images_test, 1, 4)  # channel last
 print(images_train.shape)  # (10000,32,32,3)
 print(images_test.shape)  # (10000,32,32,3)
 
+# 定义placeholder
+image_holder = tf.placeholder(tf.float32, [batch_size, 32, 32, 3])
+label_holder = tf.placeholder(tf.int32, [batch_size])
+
+weights1 = variable_with_weight_loss(shape=[5, 5, 3, 64], stddev=5e-2, wl=0.0)  # kernel1权重
+kernel1 = tf.nn.conv2d(image_holder, weights1, [1, 1, 1, 1], padding='SAME')
