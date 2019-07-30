@@ -51,6 +51,31 @@ images_train = np.rollaxis(images_train, 1, 4)  # channel last
 images_test = images_test.reshape(10000, 3, 32, 32)  # reshape维度
 images_test = np.rollaxis(images_test, 1, 4)  # channel last
 
+
+# 随机选取训练集batch_size大小的数据
+def get_random_train_data(size):
+    index = np.array(range(10000))
+    index = np.random.choice(index, size)
+    random_images = []
+    random_labels = []
+    for i in index:
+        random_images.append(images_train[i])
+        random_labels.append(labels_train[i])
+    return random_images, random_labels
+
+
+# 随机选取测试集batch_size大小的数据
+def get_random_test_data(size):
+    index = np.array(range(10000))
+    index = np.random.choice(index, size)
+    random_images = []
+    random_labels = []
+    for i in index:
+        random_images.append(images_test[i])
+        random_labels.append(labels_test[i])
+    return random_images, random_labels
+
+
 print(images_train.shape)  # (10000,32,32,3)
 print(images_test.shape)  # (10000,32,32,3)
 
@@ -89,3 +114,56 @@ local4 = tf.nn.relu(tf.matmul(local3, weight4) + bias4)
 
 # 第五层
 weight5 = variable_with_weight_loss(shape=[192, 10], stddev=1 / 192.0, wl=0.0)
+bias5 = tf.Variable(tf.constant(0.0, shape=[10]))
+logits = tf.add(tf.matmul(local4, weight5), bias5)
+
+
+# 计算loss
+def loss(logits, labels):
+    labels = tf.cast(labels, tf.int64)  # 转为int64类型
+    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels,
+                                                                   name='cross_entropy_per_example')  # 计算总交叉熵
+    cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')  # 求平均交叉熵
+    tf.add_to_collection('losses', cross_entropy_mean)  # 加入collection
+    return tf.add_n(tf.get_collection('losses'), name='total_loss')
+
+
+loss = loss(logits, label_holder)  # 计算loss
+train_op = tf.train.AdamOptimizer(1e-3).minimize(loss)  # Adam
+top_k_op = tf.nn.in_top_k(logits, label_holder, 1)  # tf.nn.in_top_k函数求出输出结果中top k的准确率，默认使用top 1，输出分数最高的那一类的准确率
+
+sess = tf.InteractiveSession()
+tf.global_variables_initializer().run()
+tf.train.start_queue_runners()  # 开启多线程操作
+
+# 开始训练
+for step in range(max_steps):
+    start_time = time.time()
+    image_batch, label_batch = get_random_train_data(batch_size)
+    print(step)
+    _, loss_value = sess.run([train_op, loss], feed_dict={image_holder: image_batch, label_holder: label_batch})
+    duration = time.time() - start_time
+
+    if step % 10 == 0:
+        examples_per_sec = batch_size / duration
+        sec_per_batch = float(duration)
+
+        format_str = ('step %d, loss=%.2f (%.1f examples/sec; %.3f sec/batch)')
+        print(format_str % step, loss_value, examples_per_sec, sec_per_batch)
+
+# 测试
+num_examples = 10000
+import math
+
+num_iter = int(math.ceil(num_examples / batch_size))
+true_count = 0
+total_sample_count = num_iter * batch_size
+step = 0
+while step < num_iter:
+    image_batch, label_batch = get_random_test_data(batch_size)
+    predictions = sess.run([top_k_op], feed_dict={image_holder: image_batch, label_holder: label_batch})
+    true_count = true_count + np.sum(predictions)
+    step = step + 1
+
+precision = true_count / total_sample_count
+print('precision @ 1 = %.3f' % precision)
