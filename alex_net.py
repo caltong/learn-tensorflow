@@ -77,7 +77,7 @@ def inference(images):
 
 # 评估运算时间
 def time_tensorflow_run(session, target, info_string):
-    num_steps_burn_in = 10
+    num_steps_burn_in = 10  # 预热
     total_duration = 0.0
     total_duration_squared = 0.0
 
@@ -100,8 +100,9 @@ def time_tensorflow_run(session, target, info_string):
 
 def run_benchmark():
     with tf.Graph().as_default():
-        image_size = 224
-        images = tf.Variable(tf.random_normal([batch_size, image_size, image_size, 3], dtype=tf.float32, stddev=1e-1))
+        image_size = 224  # 图片尺寸
+        images = tf.Variable(
+            tf.random_normal([batch_size, image_size, image_size, 3], dtype=tf.float32, stddev=1e-1))  # 随机生成数据
 
         pool5, parameters = inference(images)
 
@@ -109,11 +110,11 @@ def run_benchmark():
         sess = tf.Session()
         sess.run(init)
 
-        time_tensorflow_run(sess, pool5, "Forward")
+        time_tensorflow_run(sess, pool5, "Forward")  # 前向预测耗时
 
-        objective = tf.nn.l2_loss(pool5)
-        grad = tf.gradients(objective, parameters)
-        time_tensorflow_run(sess, grad, "Forward-backward")
+        objective = tf.nn.l2_loss(pool5)  # 模拟pool5 的 L2 损失为优化目标
+        grad = tf.gradients(objective, parameters)  # 求这个优化目标各参数的梯度，以此来模拟训练时的耗时
+        time_tensorflow_run(sess, grad, "Forward-backward")  # 模拟训练时耗时
 
 
 run_benchmark()
