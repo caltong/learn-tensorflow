@@ -13,7 +13,7 @@ def conv_op(input_op, name, kh, kw, n_out, dh, dw, p):
 
     with tf.name_scope(name) as scope:
         kernel = tf.get_variable(scope + "w", shape=[kh, kw, n_in, n_out], dtype=tf.float32,
-                                 initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                                 initializer=tf.contrib.layers.xavier_initializer_conv2d())  # The TensorFlow contrib module will not be included in TensorFlow 2.0.
         conv = tf.nn.conv2d(input_op, kernel, (1, dh, dw, 1), padding='SAME')
         bias_init_value = tf.constant(0.0, shape=[n_out], dtype=tf.float32)
         biases = tf.Variable(bias_init_value, trainable=True, name='b')
