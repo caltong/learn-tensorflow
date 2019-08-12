@@ -62,8 +62,26 @@ def inference_op(input_op, keep_prob):
     conv5_1 = conv_op(pool4, 'conv5_1', kh=3, kw=3, n_out=512, dh=1, dw=1, p=p)
     conv5_2 = conv_op(conv5_1, 'conv5_2', kh=3, kw=3, n_out=512, dh=1, dw=1, p=p)
     pool5 = mpool_op(conv5_2, 'pool5', kh=2, kw=2, dh=2, dw=2)  # 输出7x7x512
-
+    # flatten
     shp = pool5.get_shape()  # 获取pool5 shape
     flattened_shape = shp[1].value * shp[2].value * shp[3].value  # 计算flaten后的维度
-    reshp = tf.reshape(pool5, [-1, flattened_shape], name='resh1')  # 用tf.reshape 转换维度
+    reshape1 = tf.reshape(pool5, [-1, flattened_shape], name='resh1')  # 用tf.reshape 转换维度
+    # part 6
+    fc6 = fc_op(reshape1, 'fc6', n_out=4096, p=p)
+    fc6_dropout = tf.nn.dropout(fc6, keep_prob=keep_prob, name='fc6_drop')
+    # part 7
+    fc7 = fc_op(fc6_dropout, 'fc7', n_out=4096, p=p)
+    fc7_dropout = tf.nn.dropout(fc7, keep_prob=keep_prob, name='fc7_dropout')
+    # part 8
+    fc8 = fc_op(fc7_dropout, 'fc8', n_out=1000, p=p)
+    softmax = tf.nn.softmax(fc8)
+    predictions = tf.argmax(softmax, 1)
+    return predictions, softmax, fc8, p
+
+
+# 评测函数
+def time_tensorflow_run(session, target, feed, info_string):
+    num_steps_burn_in = 10  # 预热轮数
+    total_duration = 0.0
+    total_duration_squared = 0.0
     
