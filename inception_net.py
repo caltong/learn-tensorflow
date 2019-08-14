@@ -303,13 +303,13 @@ def inception_v3_arg_scope(weight_decay=0.00004,
     }
 
     with slim.arg_scope([slim.conv2d, slim.fully_connected],
-                        weights_regularizer=slim.l2_regularizer(weight_decay)):
+                        weights_regularizer=slim.l2_regularizer(weight_decay)):  # 使得conv2d和fully_connected参数默认
         with slim.arg_scope(
                 [slim.conv2d],
                 weights_initializer=trunc_normal(stddev),
                 activation_fn=tf.nn.relu,
                 normalizer_fn=slim.batch_norm,
-                normalizer_params=batch_norm_params) as sc:
+                normalizer_params=batch_norm_params) as sc:  # 嵌套slim.arg_scope使得conv2d参数默认
             return sc
 
 
