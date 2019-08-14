@@ -1,7 +1,7 @@
 import tensorflow as tf
 
-slim = tf.contrib.slim
-trunc_normal = lambda stddev: tf.truncated_normal_initializer(0.0, stddev)
+slim = tf.contrib.slim  # 使用tf.conrib.slim辅助设计
+trunc_normal = lambda stddev: tf.truncated_normal_initializer(0.0, stddev)  # 生成截断正态分布的函数
 
 
 def inception_v3_base(inputs, scope=None):
@@ -286,6 +286,7 @@ def inception_v3(inputs,
     return logits, end_points
 
 
+# 生成常用函数的默认参数
 def inception_v3_arg_scope(weight_decay=0.00004,
                            stddev=0.1,
                            batch_norm_var_collection='moving_vars'):
